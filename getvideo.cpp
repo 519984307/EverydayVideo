@@ -37,6 +37,7 @@ void GetVideo::initVideoList()
     QFile file(qApp->applicationDirPath().replace("/", "\\") + "\\PlayList.txt");
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::critical(nullptr, "无法打开文件", "无法打开\"PlayList.txt\"");
+        QApplication::quit();
     }
 
     // 读取文件
@@ -91,7 +92,7 @@ void GetVideo::playRandomVideo()
         randomIndex -= videoList.length() * 100;
 
         int i = 0;
-        while (randomIndex > uploaderWeightMap.value(uploaderList[i].toInt()) && uploaderList.length() > i) {
+        while (uploaderList.length() > i ? randomIndex > uploaderWeightMap.value(uploaderList[i].toInt()) : false) {
             randomIndex -= uploaderWeightMap.value(uploaderList[i].toInt());
             i++;
         }
@@ -103,5 +104,7 @@ void GetVideo::playRandomVideo()
         int videoNum = uploaderVideoNumMap.value(uploaderList[i].toInt());
         int videoIndex = videoNum > 1 ? QRandomGenerator::global()->bounded(1, videoNum) : 1;
         networkHelper->tryGetUploaderVideoAtIndex(uploaderList[i], videoIndex);
+    } else {
+        QApplication::quit();
     }
 }
